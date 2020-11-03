@@ -1,0 +1,43 @@
+algorithms illuminated
+def closest_pair_2D(arr_x, arr_y):
+    
+    if len(arr_x) <= 3 and len(arr_y) <= 3:
+        closest_pair = []
+        smallest_dist = float('inf')
+        for i in range(len(arr_x)-1):
+            dist = sqrt((arr_x[i][0]-arr_x[i+1][0])**2 + (arr_x[i][1]-arr_x[i+1][1])**2)
+            if dist < smallest_dist:
+                smallest_dist = dist
+                closest_pair = [arr_x[i], arr_x[i+1]]
+        return smallest_dist, closest_pair
+
+    
+    mid = len(arr_x)//2
+    left_x = arr_x[:mid]
+    right_x = arr_x[mid//2:] 
+    median = left_x[mid-1]
+    left_y, right_y = [], []
+    for coord in arr_y:
+        if coord[0] <= median[0]:
+            left_y.append(coord)
+        else:
+            right_y.append(coord)
+    dist_l, closest_pair_l = closest_pair_2D(left_x, left_y)
+    dist_r, closest_pair_r = closest_pair_2D(right_x, right_y)
+    dist_s, closest_pair_s = closest_split_pair(arr_x, arr_y, min(dist_l, dist_r))
+    rslt = ([dist_l, closest_pair_l], [dist_r, closest_pair_r], [dist_s, closest_pair_s])
+    rslt = sorted(rslt, key=lambda k: k[0])
+    return rslt[0][0], rslt[0][1]
+
+def closest_split_pair(arr_x, arr_y, delta):
+        median = arr_x[len(arr_x)//2-1]
+        S_y = [coord for coord in arr_y if median[0]-delta<=coord[0]<=median[0]+delta]
+        smallest_dist = delta
+        closest_pair = []
+        for i in range(len(S_y)-1):
+            for j in range(i+1, min(8, len(S_y)-i)):
+                dist = sqrt((S_y[i][0]-S_y[j][0])**2 + (S_y[i][1]-S_y[j][1])**2)
+                if dist < smallest_dist:
+                    smallest_dist = dist
+                    closest_pair = [S_y[i], S_y[j]]
+        return smallest_dist, closest_pair
